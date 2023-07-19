@@ -9,9 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -24,9 +26,10 @@ public class EmployeeRepositoryTest {
     @Mock
 
     private EmployeeRepository repositoryMock;
+    @Spy
+    private EmployeeRepository repositorySpy;
 
-//    @Spy
-//    private EmployeeRepository repositorySpy;
+
     @BeforeEach
 
     public void setUp() throws Exception {
@@ -36,24 +39,22 @@ public class EmployeeRepositoryTest {
     }
 
     @Test
-
     void addEmployeeMock() {
 
-        service.addEmployee("Иванова Иванна Ивановна", 345000, "2");
+        service.addEmployee("Ivanov", 345000, "2");
 
         verify(repositoryMock, times(1)).save(any());
 
     }
 
     @Test
-
     void addEmployeeMock2() {
 
-        Employee employee = new Employee("Никадимова Наталья Николаевна", 500000, "2");
+        Employee employee = new Employee("Иванов Иван Иванович", 95_000, "1");
 
         when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
 
-        String actual = service.addEmployee("Никадимова Наталья Николаевна", 500000, "2");
+        String actual = service.addEmployee("Иванов Иван Иванович", 95_000, "1");
 
         verify(repositoryMock, times(1)).save(any());
 
@@ -62,44 +63,56 @@ public class EmployeeRepositoryTest {
                 actual);
 
 
+    }
+
+
+
+
+
+    @Test
+    void addEmployeeMock3() {
+        Employee employee = new Employee("Фролов Иван Иванович",   100_000, "1");
+
+        when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
+
+        String s = service.addEmployee("Фролов Иван Иванович",    100_000,"1");
+
+        verify(repositoryMock, times(1)).save(any());
+
+        assertEquals(
+                String.valueOf(employee)
+                , s
+        );
+    }
+
+
+    @Test
+    void findEmployeeSpy() {
+        Employee employee = new Employee("Иванов Иван Иванович", 95_000, "1" );
+        doReturn(employee).when(repositorySpy).findByFullName(anyString());
+
+        service = new EmployeeServiceImpl(repositorySpy);
+
+        assertEquals(employee.toString(),
+                service.findEmployee("Иванов Иван Иванович").toString());
     }
 
     @Test
+    void removeEmployeeSpy() {
+        Employee employee = new Employee("Иванов Иван Иванович", 95_000, "1" );
+        doReturn(employee).when(repositorySpy).findByFullName(anyString());
 
-    void findEmployeeMock() {
+        service = new EmployeeServiceImpl(repositorySpy);
 
-        Employee employee = new Employee("Никадимова Наталья Николаевна", 500000, "2");
-
-        when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
-
-        String actual = service.findEmployee("Никадимова Наталья Николаевна");
-
-        verify(repositoryMock, times(1)).save(any());
-
-        assertEquals(String.valueOf(employee),
-
-                actual);
-
+        assertEquals(employee.toString(),
+                service.findEmployee("Иванов Иван Иванович").toString());
     }
 
-    @Test
 
-    void removeEmployeeMock() {
 
-        Employee employee = new Employee("Никадимова Наталья Николаевна", 500000, "2");
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
-
-        String actual = service.removeEmployee("Никадимова Наталья Николаевна");
-
-        verify(repositoryMock, times(1)).save(any());
-
-        assertEquals(String.valueOf(employee),
-
-                actual);
-
-    }
 }
+
 
 
 

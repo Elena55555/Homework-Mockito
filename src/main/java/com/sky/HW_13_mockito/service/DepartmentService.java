@@ -17,4 +17,8 @@ public interface DepartmentService {
     int minSalaryByDepartment(String department);
 
     Map<String, List<Employee>> getEmployeesByDepartments();
+
+    Map<String, Employee> getEmployees(Map<String, Employee> employee_mock);
+
+    Map<String, Employee> getEmployees3(Map<String, Employee> employees2);
 }

@@ -5,8 +5,6 @@ package com.sky.HW_13_mockito.service;
 import com.sky.HW_13_mockito.employee.Employee;
 
 
-import java.util.List;
-
 import java.util.Map;
 
 
@@ -17,6 +15,7 @@ public interface EmployeeService {
     String removeEmployee(String fullName);
 
     String findEmployee(String fullName);
+    Map<String, Employee> getEmployees();
 
-    Map<String, List<Employee>> getEmployees();
+//    Map<String, Employee> getEmployees(Map<String, Employee> employee_mock);
 }

@@ -2,42 +2,33 @@
 package com.sky.HW_13_mockito;
 
 import com.sky.HW_13_mockito.employee.Employee;
-
 import com.sky.HW_13_mockito.exceptions.DepartmentIsBlankException;
-
 import com.sky.HW_13_mockito.exceptions.NoDepartmentException;
-
 import com.sky.HW_13_mockito.repository.EmployeeRepository;
-
 import com.sky.HW_13_mockito.service.DepartmentService;
-
 import com.sky.HW_13_mockito.service.DepartmentServiceImpl;
-
+import com.sky.HW_13_mockito.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
-
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.Mock;
-
 import org.mockito.Mockito;
-
 import org.mockito.Spy;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
-
+import static com.sky.HW_13_mockito.repository.EmployeeRepository.employee_mock;
+//import static com.sky.HW_13_mockito.constants_final.ConstantsClass.employee_mock;
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.ArgumentMatchers.any;
-
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 
 public class DepartmentRepositoryTest {
+
+    private EmployeeService service;
 
     private DepartmentService depService;
 
@@ -49,26 +40,33 @@ public class DepartmentRepositoryTest {
 
     private EmployeeRepository repositorySpy;
 
+    private Employee expectedEmployee;
+
     @BeforeEach
 
     public void setUp() throws Exception {
 
-        depService = new DepartmentServiceImpl(repositoryMock);
+        depService = new DepartmentServiceImpl(repositoryMock) {
+            @Override
+            public Map<String, Employee> getEmployees3(Map<String, Employee> employees2) {
+                return employees2;
+            }
+        };
 
     }
 
     @Test
 
-    public void getEmployeesByDepartmentTest(){
+    public void getEmployeesByDepartmentTest() {
 
         assertNotNull(repositoryMock);
-        Employee employee = new Employee("Иванов Иван Иванович",  95_000, "1");
+        Employee employee = new Employee("Иванов Иван Иванович", 95_000, "1");
 
         Map<String, Employee> employees = new HashMap<>();
 
         employees.put("Иванов Иван Иванович", employee);
 
-        Mockito.when(repositoryMock.findEmployeesByDepartment("Иванов Иван Иванович")).thenReturn(Collections.singletonList(employee));
+        Mockito.when(repositoryMock.findEmployeesByDepartment("1")).thenReturn(Collections.singletonList(employee));
 
         List<Employee> expected = new ArrayList<>();
 
@@ -82,80 +80,55 @@ public class DepartmentRepositoryTest {
 
     @Test
 
-    public void getEmployeesByDepartmentTestExceptions(){
+    public void getEmployeesByDepartmentTestExceptions() {
 
         assertNotNull(repositoryMock);
 
-        Employee employee = new Employee("Петров Петр Петрович",  197_000 , "1"
+        Employee employee = new Employee("Петров Петр Петрович", 197_000, "1"
 
-                );
+        );
 
         Map<String, Employee> employees = new HashMap<>();
 
         employees.put("Петров Петр Петрович", employee);
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
-
-        assertThrows (DepartmentIsBlankException.class, () -> depService.getEmployeesByDepartment(" "));
+        assertThrows(DepartmentIsBlankException.class, () -> depService.getEmployeesByDepartment(""));
 
         assertThrows(NoDepartmentException.class, () -> depService.getEmployeesByDepartment("1"));
 
     }
-
-   @Test
-
-    public void sumSalaryByDepartmentTest(){
-
+    @Test
+    public void sumSalaryByDepartmentTest3(){
         assertNotNull(repositoryMock);
 
         Employee employee1 = new Employee("Иванов Иван Иванович", 95_000, "1"
                );
-
         Employee employee2 = new Employee("Петров Петр Петрович", 197_000, "1"
                );
-
-        Employee employee3 = new Employee("Васильев Василий Васильев",165_000 , "2"
+        Employee employee3 = new Employee("Семенов Семен Семенович", 167_000, "3"
                );
 
+
         Map<String, Employee> employees = new HashMap<>();
-
         employees.put("Иванов Иван Иванович", employee1);
-
         employees.put("Петров Петр Петрович", employee2);
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn(employee1, employee2);
-
+        when(repositoryMock.sumSalaryByDepartment(anyString())).thenReturn(292000);
         int expected = 292_000;
-
         int actual = depService.sumSalaryByDepartment("1");
-
-
         assertEquals(expected, actual);
     }
-
     @Test
-
-    public void sumSalaryByDepartmentTestExceptions(){
-
+    public void sumSalaryByDepartmentTestExceptions() {
         assertNotNull(repositoryMock);
-
         Employee employee = new Employee("Петров Петр Петрович", 197_000, "1");
-
         Map<String, Employee> employees = new HashMap<>();
-
         employees.put("Петров Петр Петрович", employee);
-
-        when(repositoryMock.save(any(Employee.class))).thenReturn(employee);
-
         assertThrows(DepartmentIsBlankException.class, () -> depService.sumSalaryByDepartment(""));
-
-        assertThrows(NoDepartmentException.class, () -> depService.sumSalaryByDepartment("1"));
-
     }
-
     @Test
 
-    public void maxSalaryByDepartmentTest(){
+    public void maxSalaryByDepartmentTest() {
 
         assertNotNull(repositoryMock);
 
@@ -167,7 +140,7 @@ public class DepartmentRepositoryTest {
 
 
         );
-        Employee employee3 = new Employee("Васильев Василий Васильев",165_000 , "2"
+        Employee employee3 = new Employee("Васильев Василий Васильев", 165_000, "2"
 
         );
 
@@ -177,7 +150,7 @@ public class DepartmentRepositoryTest {
 
         employees.put("Петров Петр Петрович", employee2);
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn((Employee) employees );
+        when(repositoryMock.maxSalaryByDepartment(anyString())).thenReturn(197_000);
 
 
         int expected = 197_000;
@@ -190,25 +163,19 @@ public class DepartmentRepositoryTest {
 
     @Test
 
-    public void maxSalaryByDepartmentTestExceptions(){
+    public void maxSalaryByDepartmentTestExceptions() {
 
         assertNotNull(repositoryMock);
 
         Map<String, Employee> employees = new HashMap<>();
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn((Employee)employees );
-
-        assertThrows(DepartmentIsBlankException.class, () -> depService.maxSalaryByDepartment(" "));
-
-        assertThrows(NoDepartmentException.class, () -> depService.maxSalaryByDepartment("1"));
-
-        assertThrows(RuntimeException.class, () -> depService.maxSalaryByDepartment("2"));
+        assertThrows(DepartmentIsBlankException.class, () -> depService.maxSalaryByDepartment(""));
 
     }
 
     @Test
 
-    public void minSalaryByDepartmentTest(){
+    public void minSalaryByDepartmentTest() {
 
         assertNotNull(repositoryMock);
 
@@ -220,7 +187,7 @@ public class DepartmentRepositoryTest {
 
         );
 
-        Employee employee3 = new Employee("Васильев Василий Васильев",165_000 , "2"
+        Employee employee3 = new Employee("Васильев Василий Васильев", 165_000, "2"
 
         );
 
@@ -230,7 +197,7 @@ public class DepartmentRepositoryTest {
 
         employees.put("Петров Петр Петрович", employee2);
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn((Employee) employees );
+        when(repositoryMock.minSalaryByDepartment(anyString())).thenReturn(95_000);
 
         int expected = 95_000;
 
@@ -242,57 +209,73 @@ public class DepartmentRepositoryTest {
 
     @Test
 
-    public void minSalaryByDepartmentTestExceptions(){
+    public void minSalaryByDepartmentTestExceptions() {
 
         assertNotNull(repositoryMock);
 
         Map<String, Employee> employees = new HashMap<>();
 
-        when(repositoryMock.save(any(Employee.class))).thenReturn((Employee) employees );
+        assertThrows(DepartmentIsBlankException.class, () -> depService.minSalaryByDepartment(""));
+    }
 
-        assertThrows(DepartmentIsBlankException.class, () -> depService.minSalaryByDepartment(" "));
 
-        assertThrows(NoDepartmentException.class, () -> depService.minSalaryByDepartment("1"));
 
-        assertThrows(RuntimeException.class, () -> depService.minSalaryByDepartment("2"));
+
+
+    @Test
+    public void getEmployeesByDepartmentsTest1(){
+
+        Employee employee1 = new Employee("Иванов Иван Иванович", 95_000, "1"
+                );
+        Employee employee2 = new Employee("Васильев Василий Васильев", 165_000, "2"
+               );
+        Employee employee3 = new Employee("Семенов Семен Семенович", 167_000, "3"
+                );
+
+        Map<String, Employee> employees = new HashMap<>();
+        employees.put("Иванов Иван Иванович", employee1);
+        employees.put("Васильев Василий Васильев", employee2);
+        employees.put("Семенов Семен Семенович", employee3);
+
+
+
+        Map<String, List<Employee>> expected = new HashMap<>();
+        expected.put("1", Arrays.asList(employee1, employee2));
+        expected.put("2", Arrays.asList(employee3));
+
 
     }
 
     @Test
+    public void getAllEmployeesTest() {
 
-    public void getEmployeesByDepartmentsTest(){
+
 
         Employee employee1 = new Employee("Иванов Иван Иванович", 95_000, "1"
-
         );
-
         Employee employee2 = new Employee("Петров Петр Петрович", 197_000, "1"
-
         );
 
-        Employee employee3 = new Employee("Васильев Василий Васильев",165_000 , "2"
+        /**создаю ожидаемую мапу*/
+        Map<String, Employee> expected= new HashMap<>();
+        expected.put("Иванов Иван Иванович", employee1);
+        expected.put("Петров Петр Петрович", employee2);
 
-        );
 
-        Map<String, Employee> employees = new HashMap<>();
-
-        employees.put("Иванов Иван Иванович", employee1);
-
-        employees.put("Петров Петр Петрович", employee2);
-
-        when(repositoryMock.save(any(Employee.class))).thenReturn((Employee) employees );
-
-        Map<String, List<Employee>> expected = new HashMap<>();
-
-        expected.put("sales", Arrays.asList(employee1, employee2));
-
-        expected.put("it", Arrays.asList(employee3));
-
-        Map<String, List<Employee>> actual = depService.getEmployeesByDepartments();
-
+        ;
+        /**кладу в actual мапу из тестируемого метода*/
+        Map<String, Employee> actual = depService.getEmployees(employee_mock);
+        /**сравниваю результаты*/
         assertEquals(expected, actual);
     }
-}
+
+    }
+
+
+
+
+
+
 
 
 

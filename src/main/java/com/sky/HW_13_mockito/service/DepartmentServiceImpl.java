@@ -1,9 +1,11 @@
 
 package com.sky.HW_13_mockito.service;
 
+import com.sky.HW_13_mockito.constants_final.ConstantsClass;
 import com.sky.HW_13_mockito.employee.Employee;
 
 import com.sky.HW_13_mockito.repository.EmployeeRepository;
+
 
 import org.springframework.stereotype.Service;
 
@@ -17,9 +19,9 @@ import java.util.Map;
 
 @Service
 
-public class DepartmentServiceImpl implements DepartmentService {
+public abstract class DepartmentServiceImpl implements DepartmentService {
 
-    private final EmployeeRepository repository;
+    private EmployeeRepository repository;
 
     public DepartmentServiceImpl(EmployeeRepository repository) {
         this.repository = repository;
@@ -34,6 +36,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
     }
+//    public List<Employee> getEmployeesByDepartment2(String department){
+//
+//        throwExceptions(department);
+//
+//        return repository.getEmployees().values().stream()
+//                .filter(e -> e.getDepartment().contains(department))
+//                .collect(Collectors.toList());
+//    }
 
     @Override
 
@@ -58,6 +68,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         throwExceptions(department);
 
         return repository.sumSalaryByDepartment(department);
+//        return sumSalaryByDepartment(department);
 
     }
 
@@ -88,5 +99,23 @@ public class DepartmentServiceImpl implements DepartmentService {
             return repository.findEmployeesGroupByDepartments();
 
     }
+//    Map<String,  List<Employee>> employees = new HashMap<>();
 
-}
+    @Override
+    public Map<String, Employee> getEmployees(Map<String, Employee> employee_mock) {
+        return ConstantsClass.employee_mock;
+    }
+
+
+//    @Override
+//    public Map<Integer, List<Employee>> getEmployees3() {
+//        return employee_mock ;
+
+    }
+
+
+
+
+
+
+
